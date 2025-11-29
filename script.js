@@ -1,85 +1,151 @@
-
 const States = {
-    FREEZING: "Freezing",
-    COLD: "Cold",
-    CHILLY: "Chilly",
-    WARM: "Warm",
-    HOT: "Hot",
-    SCORCHING: "Scorching",
-    UNKNOWN: "Unknown",
+  FREEZING: "Freezing",
+  COLD: "Cold",
+  CHILLY: "Chilly",
+  WARM: "Warm",
+  HOT: "Hot",
+  SCORCHING: "Scorching",
+  UNKNOWN: "Unknown",
 };
 
-const notFoundMessage = "Not Found"
-const somethingWentWrongMessage = "Sorry Something Went Wrong"
+const notFoundMessage = "Not Found";
+const somethingWentWrongMessage = "Sorry Something Went Wrong";
 
-const temperature = document.querySelector(".temp")
-const locationField = document.querySelector(".loc p")
-const date = document.querySelector(".time p")
-const weather = document.querySelector(".condition p")
-const search = document.querySelector(".search_field")
-const form = document.querySelector('form')
+const temperature = document.querySelector(".temp p");
+const locationField = document.querySelector(".loc p");
+const dateField = document.querySelector(".time p");
+const weatherField = document.querySelector(".condition p");
+const search = document.querySelector(".search_field");
+const form = document.querySelector("form");
 
-let locMap = new Map()
+search.value = "Madrid"
 
-locMap.set("Quijorna", [40.4276,-4.0568])
+let locMap = new Map();
+locMap.set("Quijorna", [40.4276, -4.0568]);
 
-const fetchData = async (lat, long) =>{
-	const res = await fetch(getUrl(lat,long))
-	const data = await res.json()
 
-	console.log(data)
-	updatePage(data.current.temperature_2m,search.value,data.current.time,getState(data.current.temperature_2m))
+const fetchData = async (lat, long) => {
+  try {
+    const res = await fetch(getUrl(lat, long));
+    const data = await res.json();
+
+    const temp = data.current.temperature_2m;
+    const time = formatDate(data.current.time);
+    const state = getState(temp);
+
+    updatePage(temp, search.value, time, state);
+  } catch (err) {
+    console.error(err);
+    updatePage(somethingWentWrongMessage, "", "", States.UNKNOWN);
+  }
+};
+
+function getUrl(lat, long) {
+  return (
+    "https://api.open-meteo.com/v1/forecast?latitude=" +
+    lat +
+    "&longitude=" +
+    long +
+    "&current=temperature_2m&forecast_days=1&models=jma_seamless"
+  );
 }
 
-function getUrl(lat, long){
-	return "https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+long+"&current=temperature_2m&forecast_days=1&models=jma_seamless";
+function formatDate(iso) {
+  if (!iso) return "";
+
+  const dateObj = new Date(iso);
+  const day = dateObj.getDate();
+
+  const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const month = monthNames[dateObj.getMonth()];
+
+  const hours = String(dateObj.getHours()).padStart(2, "0");
+  const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+  return `${day} ${month}, ${hours}:${minutes}`;
 }
 
-function updatePage(temp, loc , time, weath){
-	try{
-		temperature.innerText = temp
-		locationField.innerText = loc
-		date.innerText = time
-		weather.innerText = weath
-	}catch{
-		temperature.innerText = somethingWentWrongMessage
-		locationField.innerText = ""
-		date.innerText = ""
-		weather.innerText = ""
-	}
+function updateBackground(state) {
+  document.body.className = "";
+  if (!state) return;
+  document.body.classList.add(state.toLowerCase());
 }
 
-function getState(temperature)
-{
-	switch (true) {
-		case temperature <= 0:
-		  return States.FREEZING;
-		case temperature <= 10:
-		  return States.COLD;
-		case temperature <= 15:
-		  return States.CHILLY;
-		case temperature <= 25:
-		  return States.WARM;
-		case temperature <= 35:
-		  return States.HOT;
-		case temperature >= 35:
-		  return States.SCORCHING;
-		default:
-		  throw new Error("Invalid temperature value");
-	  }
+function animateUpdate() {
+  const box = document.querySelector(".weather_container");
+  box.classList.add("fade");
+  setTimeout(() => box.classList.remove("fade"), 500);
+}
+function getWeatherIcon(state) {
+  switch (state) {
+    case States.FREEZING: return "❄️";
+    case States.COLD: return "🥶";
+    case States.CHILLY: return "🌬️";
+    case States.WARM: return "🌤️";
+    case States.HOT: return "☀️";
+    case States.SCORCHING: return "🔥";
+    default: return "❓";
+  }
 }
 
-function searchData(e){
- 	e.preventDefault()
-	let coord = locMap.get(search.value)
-	if(coord == undefined){
-		updatePage(notFoundMessage,"","","")
-		return
-	}
-	lat = coord[0]
-	long = coord[1]
-	console.log(lat)
- 	fetchData(lat,long)
+function updatePage(temp, loc, time, state) {
+  try {
+    temperature.innerText = temp + "º";
+    locationField.innerText = loc;
+    dateField.innerText = time;
+    weatherField.innerText = `${state} ${getWeatherIcon(state)}`;
+  } catch (err) {
+    console.error(err);
+    temperature.innerText = somethingWentWrongMessage;
+    locationField.innerText = "";
+    dateField.innerText = "";
+    weatherField.innerText = "";
+  }
+
+  updateBackground(state);
+  animateUpdate();
 }
 
-form.addEventListener('submit', searchData)
+function getState(temperature) {
+  if (temperature <= 0) return States.FREEZING;
+  if (temperature <= 10) return States.COLD;
+  if (temperature <= 15) return States.CHILLY;
+  if (temperature <= 25) return States.WARM;
+  if (temperature < 35) return States.HOT;
+  return States.SCORCHING;
+}
+
+async function searchData(e) {
+  e.preventDefault();
+  const city = search.value.trim();
+
+  if (!city) {
+    updatePage("Not Found", "", "", "");
+    return;
+  }
+
+  try {
+    const geoRes = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
+    );
+    const geoData = await geoRes.json();
+
+    if (!geoData.results || geoData.results.length === 0) {
+      updatePage("Not Found", "", "", "");
+      return;
+    }
+
+    const { latitude, longitude, name } = geoData.results[0];
+    fetchData(latitude, longitude);
+    locationField.innerText = name;
+
+  } catch (err) {
+    console.error(err);
+    updatePage("Error", "", "", "");
+  }
+}
+
+
+form.addEventListener("submit", searchData);
+
+searchData()
