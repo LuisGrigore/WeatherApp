@@ -1,4 +1,4 @@
-![Descripción de la imagen](readme_assets/page_view.png)
+![WeatherApp view](readme_assets/page_view.png)
 
 # WeatherApp 🌤️
 
@@ -20,11 +20,9 @@ A simple weather application that shows the current temperature, location, time,
 - **Open-Meteo API** for weather data  
 - **Open-Meteo Geocoding API** for city search
 
-## How to Run
+## Demo
 
-1. Clone the repository:  
-2. Open `index.html` in your browser.  
-3. Type a city name in the search bar and press **Search**.
+[Try WeatherApp](https://luisgrigore.github.io/WeatherApp/)
 
 ## Project Structure
 
@@ -42,4 +40,4 @@ WeatherApp/
 
 - Default search is set to **Madrid**.  
 - If the city is not found, it displays a **Not Found** message.  
-- Handles errors gracefully with a fallback message."
+- Handles errors gracefully with a fallback message.
