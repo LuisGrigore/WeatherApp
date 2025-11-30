@@ -1,6 +1,6 @@
 ![Descripción de la imagen](readme_assets/page_view.png)
 
-"# WeatherApp 🌤️
+# WeatherApp 🌤️
 
 A simple weather application that shows the current temperature, location, time, and weather condition with dynamic backgrounds and icons based on the temperature. Users can search for any city to get its weather data.
 
