@@ -1,3 +1,5 @@
+//import '../css/styles.css';
+
 const States = {
   FREEZING: "Freezing",
   COLD: "Cold",

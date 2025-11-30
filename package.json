@@ -1,0 +1,27 @@
+{
+  "name": "weatherapp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+      "build": "node build.js",
+  	  "preview": "npx serve dist",
+  	  "deploy": "npm run build && gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisGrigore/WeatherApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuisGrigore/WeatherApp/issues"
+  },
+  "homepage": "https://github.com/LuisGrigore/WeatherApp#readme",
+  "devDependencies": {
+    "csso": "^5.0.5",
+    "esbuild": "^0.27.0",
+    "gh-pages": "^6.3.0",
+    "html-minifier-terser": "^7.2.0"
+  }
+}
