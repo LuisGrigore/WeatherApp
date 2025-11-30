@@ -23,19 +23,6 @@ A simple weather application that shows the current temperature, location, time,
 ## Demo
 
 [Try WeatherApp](https://luisgrigore.github.io/WeatherApp/ "WeatherApp")
-<a href="https://luisgrigore.github.io/WeatherApp/ " target="_blank">Try WeatherApp</a>
-
-## Project Structure
-
-\```
-WeatherApp/
-│
-├── index.html          # Main HTML file
-├── styles.css          # Styling
-├── js/
-│   └── main.js         # JavaScript logic
-└── README.md           # Project documentation
-\```
 
 ## Notes
 
